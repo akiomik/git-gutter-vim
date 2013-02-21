@@ -1,6 +1,8 @@
-sign define change text=! texthl=SignColumn
-sign define add    text=+ texthl=SignColumn
-sign define delete text=_ texthl=SignColumn
+sign define change        text=! texthl=SignColumn
+sign define add           text=+ texthl=SignColumn
+sign define delete_top    text=^ texthl=SignColumn
+sign define delete_bottom text=_ texthl=SignColumn
+
 
 " マーク行をリセットするために行数を保存する変数
 if !exists('w:marked_lines')
@@ -120,10 +122,11 @@ function! gitgutter#git_gutter(...)
 				call s:mark('change', after_begin, after_end)
 			" 削除の場合
 			elseif (ope == 'd')
-				" TODO 1行めを削除した場合、おかしくなる
-				call s:mark('delete', after_begin, after_end)
+				if after_begin > 0
+					call s:mark('delete_bottom', after_begin, after_end)
+				endif
+				call s:mark('delete_top', after_begin + 1, after_end + 1)
 			endif
 		endif
 	endfor
 endfunction
-
