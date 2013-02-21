@@ -4,13 +4,16 @@ sign define delete_top    text=^ texthl=SignColumn
 sign define delete_bottom text=_ texthl=SignColumn
 
 
-" マーク行をリセットするために行数を保存する変数
+" init window variables
 if !exists('w:marked_lines')
 	let w:marked_lines = []
 endif
 
 
-" マークする
+" mark a gutter
+" name:  sign name
+" begin: mark begin line number
+" end:   mark end line number
 function! s:mark(name, begin, end)
 	let i = str2nr(a:begin)
 	let end = str2nr(a:end)
@@ -22,7 +25,7 @@ function! s:mark(name, begin, end)
 endfunction
 
 
-" マークをリセットする
+" reset all marks
 function! s:reset_marks()
 	if exists('w:marked_lines')
 		for i in w:marked_lines
@@ -33,13 +36,13 @@ function! s:reset_marks()
 endfunction
 
 
-" 現在のファイル用の一時ファイルパス取得
+" get a path of temporary file for current file
 function! s:get_current_file_path()
 	return substitute(tempname(), '\', '/', 'g')
 endfunction
 
 
-" 現在のディレクトリがgitのリポジトリかどうか判定する
+" check for a git repository
 function! s:is_git_repos()
 	let path = expand("%:r")
 	let ret = system('git status ' . path . ' 2> /dev/null; echo $?')
@@ -52,7 +55,7 @@ function! s:is_git_repos()
 endfunction
 
 
-" ファイルが編集済みかどうか判定
+" check for a file status
 function! s:is_modified()
 	redir => ret
 		silent se modified?
@@ -67,7 +70,8 @@ function! s:is_modified()
 endfunction
 
 
-" 現在のファイルとコミット済みファイルとのdiffを取得する
+" get different between HEAD and current
+" current: current file path
 function! gitgutter#get_diff(current)
 	let filename = expand("%")	" NOTE: %:p だとフルパス
 
@@ -76,19 +80,19 @@ function! gitgutter#get_diff(current)
 endfunction
 
 
-" コミット済み情報とのdiffをマークする
+" git gutter
 function! gitgutter#git_gutter(...)
-	" 編集中のファイルがgitリポジトリ下でなければ終了
+	" check for a git repo
 	if (!s:is_git_repos())
 		return
 	endif
 
-	" 編集中のファイルが未変更であれば終了
+	" check for a file stat
 	if (!s:is_modified())
 "		return
 	endif
 
-	" diffの取得
+	" get diff
 	if exists('a:1')
 		" 引数があれば、それを比較対象にする
 		let current = gitgutter#get_diff(a:1)
@@ -97,30 +101,29 @@ function! gitgutter#git_gutter(...)
 		let current = s:get_current_file_path()
 		silent execute 'write! ' . escape(current, ' ')
 	endif
-	let diff = gitgutter#get_diff(current)
 
-	" マークをリセット
+	" reset all marks
 	call s:reset_marks()
 
-	" diffを解析
+	" parse diff
 	for line in diff
-		" '12c24,25' といった行とマッチ
+		" pattern match (e.g. '12c24,25')
 		let head_pattern = '^\([0-9]\+\),\?\([0-9]*\)\([acd]\)\([0-9]\+\),\?\([0-9]*\)$'
 		if (match(line, head_pattern) >= 0)
 			let [origin,before_begin,before_end,ope,after_begin,after_end;_] = matchlist(line, head_pattern)
 
-			" endがない場合は1行のみマーク
+			" mark only one line when end is empty
 			if (after_end == '')
 				let after_end = after_begin
 			endif
 
-			" 追加の場合
+			" when added
 			if (ope == 'a')
 				call s:mark('add', after_begin, after_end)
-			" 変更の場合
+			" when changed
 			elseif (ope == 'c')
 				call s:mark('change', after_begin, after_end)
-			" 削除の場合
+			" when deleted
 			elseif (ope == 'd')
 				if after_begin > 0
 					call s:mark('delete_bottom', after_begin, after_end)
