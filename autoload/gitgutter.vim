@@ -1,4 +1,3 @@
-let g:git_gutter_place = 2013
 sign define change text=! texthl=SignColumn
 sign define add    text=+ texthl=SignColumn
 sign define delete text=_ texthl=SignColumn
@@ -22,19 +21,13 @@ endfunction
 
 
 " マークをリセットする
-function! s:reset_mark()
+function! s:reset_marks()
 	if exists('w:marked_lines')
 		for i in w:marked_lines
 			exe ":sign unplace " . i . " file=" . expand("%:p")
 		endfor
 	endif
 	let w:marked_lines = []
-endfunction
-
-
-" 引数で渡されたファイルのコミット内容を取得する
-function! s:get_commited_file(file)
-	return system('git show HEAD:' . a:file)
 endfunction
 
 
@@ -46,7 +39,6 @@ endfunction
 
 " 現在のディレクトリがgitのリポジトリかどうか判定する
 function! s:is_git_repos()
-"	let ret = system('git rev-parse --is-inside-work-tree')[ : 3]
 	let path = expand("%:r")
 	let ret = system('git status ' . path . ' 2> /dev/null; echo $?')
 
@@ -76,7 +68,6 @@ endfunction
 " 現在のファイルとコミット済みファイルとのdiffを取得する
 function! gitgutter#get_diff(current)
 	let filename = expand("%")	" NOTE: %:p だとフルパス
-	let commited = s:get_commited_file(filename)
 
 	let diff = system('git show HEAD:' . filename . ' | diff - ' . a:current)
     return split(diff, '\n')
@@ -87,7 +78,6 @@ endfunction
 function! gitgutter#git_gutter(...)
 	" 編集中のファイルがgitリポジトリ下でなければ終了
 	if (!s:is_git_repos())
-"		throw "Error!! Here is not git repository."
 		return
 	endif
 
@@ -108,7 +98,7 @@ function! gitgutter#git_gutter(...)
 	let diff = gitgutter#get_diff(current)
 
 	" マークをリセット
-	call s:reset_mark()
+	call s:reset_marks()
 
 	" diffを解析
 	for line in diff
@@ -136,3 +126,4 @@ function! gitgutter#git_gutter(...)
 		endif
 	endfor
 endfunction
+
