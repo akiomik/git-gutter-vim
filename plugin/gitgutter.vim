@@ -1,4 +1,4 @@
-command! -nargs=? -complete=file GitGutter :call gitgutter#git_gutter(<f-args>)
+command! -nargs=0 GitGutter :call gitgutter#git_gutter()
 
 if has("autocmd")
 	augroup gitgutter

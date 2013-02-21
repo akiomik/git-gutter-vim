@@ -72,7 +72,7 @@ endfunction
 
 " get different between HEAD and current
 " current: current file path
-function! gitgutter#get_diff(current)
+function! s:get_diff(current)
 	let filename = expand("%")	" NOTE: %:p だとフルパス
 
 	let diff = system('git show HEAD:' . filename . ' | diff - ' . a:current)
@@ -81,7 +81,7 @@ endfunction
 
 
 " git gutter
-function! gitgutter#git_gutter(...)
+function! gitgutter#git_gutter()
 	" check for a git repo
 	if (!s:is_git_repos())
 		return
@@ -93,14 +93,9 @@ function! gitgutter#git_gutter(...)
 	endif
 
 	" get diff
-	if exists('a:1')
-		" 引数があれば、それを比較対象にする
-		let current = gitgutter#get_diff(a:1)
-	else
-		" 引数がなければ、現在のファイルを利用
-		let current = s:get_current_file_path()
-		silent execute 'write! ' . escape(current, ' ')
-	endif
+	let current = s:get_current_file_path()
+	silent execute 'write! ' . escape(current, ' ')
+	let diff = s:get_diff(current)
 
 	" reset all marks
 	call s:reset_marks()
