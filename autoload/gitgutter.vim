@@ -4,8 +4,8 @@ sign define add    text=+ texthl=SignColumn
 sign define delete text=_ texthl=SignColumn
 
 " マーク行をリセットするために行数を保存する変数
-if !exists('w:marked_line_num')
-	let w:marked_line_num = 0
+if !exists('w:marked_lines')
+	let w:marked_lines = []
 endif
 
 
@@ -14,8 +14,8 @@ function! s:mark(name, begin, end)
 	let i = str2nr(a:begin)
 	let end = str2nr(a:end)
 	while (i <= end)
-		exe ":sign place " . g:git_gutter_place . " line=" . i . " name=" . a:name . " file=" . expand("%:p")
-		let w:marked_line_num += 1
+		exe ":sign place " . i . " line=" . i . " name=" . a:name . " file=" . expand("%:p")
+        call add(w:marked_lines, i)
 		let i += 1
 	endwhile
 endfunction
@@ -23,14 +23,12 @@ endfunction
 
 " マークをリセットする
 function! s:reset_mark()
-	if exists('w:marked_line_num')
-		let i = 0
-		while i <= w:marked_line_num
-			exe ":sign unplace " . g:git_gutter_place
-			let i += 1
-		endwhile
+	if exists('w:marked_lines')
+		for i in w:marked_lines
+			exe ":sign unplace " . i . " file=" . expand("%:p")
+		endfor
 	endif
-	let w:marked_line_num = 0
+	let w:marked_lines = []
 endfunction
 
 
