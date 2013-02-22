@@ -24,6 +24,7 @@ NeoBundle 'akiomik/git-gutter-vim'
 :NeoBundleInstall
   ```
 
-3. License
+
+## License
 
   The MIT License. See `LICENSE`.
