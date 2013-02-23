@@ -1,13 +1,46 @@
-sign define change        text=! texthl=SignColumn
-sign define add           text=+ texthl=SignColumn
-sign define delete_top    text=^ texthl=SignColumn
-sign define delete_bottom text=_ texthl=SignColumn
+" get sign ctrembg color
+function! s:get_sign_ctermbg()
+    redir => sign_col
+        silent hi SignColumn
+    redir END
+
+    let index = match(sign_col, 'ctermbg')
+    let ctermbg = strpart(sign_col, index + 8, 3)
+    return ctermbg
+endfunction
 
 
-" init window variables
-if !exists('w:marked_lines')
-    let w:marked_lines = []
-endif
+" get sign guibg color
+function! s:get_sign_guibg()
+    redir => sign_col
+        silent hi SignColumn
+    redir END
+
+    let index = match(sign_col, 'guibg')
+    let guibg = strpart(sign_col, index + 6, 7)
+    return guibg
+endfunction
+
+
+" initialization
+function! s:init()
+    let ctermbg = s:get_sign_ctermbg()
+    let guibg = s:get_sign_guibg()
+
+    exec 'hi gitGutterChange ctermfg=darkyellow guifg=#ffcc00 ctermbg=' . ctermbg . ' guibg=' . guibg
+    exec 'hi gitGutterAdd    ctermfg=darkgreen  guifg=#00ee00 ctermbg=' . ctermbg . ' guibg=' . guibg
+    exec 'hi gitGutterDelete ctermfg=darkred    guifg=#dd0000 ctermbg=' . ctermbg . ' guibg=' . guibg
+
+    sign define change        text=! texthl=gitGutterChange
+    sign define add           text=+ texthl=gitGutterAdd
+    sign define delete_top    text=^ texthl=gitGutterDelete
+    sign define delete_bottom text=_ texthl=gitGutterDelete
+
+    " init window variables
+    if !exists('w:marked_lines')
+        let w:marked_lines = []
+    endif
+endfunction
 
 
 " mark a gutter
@@ -128,3 +161,7 @@ function! gitgutter#git_gutter()
         endif
     endfor
 endfunction
+
+
+" main
+call s:init()
