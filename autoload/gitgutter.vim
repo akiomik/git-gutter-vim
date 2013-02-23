@@ -38,7 +38,8 @@ function! s:init()
 
     " init window variables
     if !exists('w:marked_lines')
-        let w:marked_lines = []
+        let w:marked_lines = {}
+        let w:prev_marked_lines = {}
     endif
 endfunction
 
@@ -51,21 +52,24 @@ function! s:mark(name, begin, end)
     let i = str2nr(a:begin)
     let end = str2nr(a:end)
     while (i <= end)
+        " reset
+        call s:reset_mark(i)
+
+        " set
         exe ":sign place " . i . " line=" . i . " name=" . a:name . " file=" . expand("%:p")
-        call add(w:marked_lines, i)
+        let w:marked_lines[i] = a:name
+
         let i += 1
     endwhile
 endfunction
 
 
-" reset all marks
-function! s:reset_marks()
-    if exists('w:marked_lines')
-        for i in w:marked_lines
-            exe ":sign unplace " . i . " file=" . expand("%:p")
-        endfor
+" reset mark
+function! s:reset_mark(i)
+    if has_key(w:prev_marked_lines, a:i)
+        exe ":sign unplace " . a:i . " file=" . expand("%:p")
+        call remove(w:prev_marked_lines, a:i)
     endif
-    let w:marked_lines = []
 endfunction
 
 
@@ -130,8 +134,9 @@ function! gitgutter#git_gutter()
     silent execute 'write! ' . escape(current, ' ')
     let diff = s:get_diff(current)
 
-    " reset all marks
-    call s:reset_marks()
+    " init marked lines
+    let w:prev_marked_lines = w:marked_lines
+    let w:marked_lines = {}
 
     " parse diff
     for line in diff
@@ -159,6 +164,10 @@ function! gitgutter#git_gutter()
                 call s:mark('delete_top', after_begin + 1, after_end + 1)
             endif
         endif
+    endfor
+
+    for i in keys(w:prev_marked_lines)
+        call s:reset_mark(i)
     endfor
 endfunction
 
