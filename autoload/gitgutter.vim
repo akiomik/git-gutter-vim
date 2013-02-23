@@ -75,7 +75,7 @@ endfunction
 function! s:get_diff(current)
     let filename = expand("%")  " NOTE: %:p だとフルパス
 
-    let diff = system('git show HEAD:' . filename . ' | diff - ' . a:current)
+    let diff = system('git show HEAD:./' . filename . ' | diff - ' . a:current)
     return split(diff, '\n')
 endfunction
 
