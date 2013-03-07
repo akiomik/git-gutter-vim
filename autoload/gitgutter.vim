@@ -27,9 +27,9 @@ function! s:init()
     let ctermbg = s:get_sign_ctermbg()
     let guibg = s:get_sign_guibg()
 
-    exec 'hi gitGutterChange ctermfg=darkyellow guifg=#ffcc00 ctermbg=' . ctermbg . ' guibg=' . guibg
-    exec 'hi gitGutterAdd    ctermfg=darkgreen  guifg=#00ee00 ctermbg=' . ctermbg . ' guibg=' . guibg
-    exec 'hi gitGutterDelete ctermfg=darkred    guifg=#dd0000 ctermbg=' . ctermbg . ' guibg=' . guibg
+    exec 'hi gitGutterChange ctermfg=darkyellow guifg=#ffcc00 ctermbg=' . ctermbg . ' guibg=' . guibg . ' cterm=bold gui=bold'
+    exec 'hi gitGutterAdd    ctermfg=darkgreen  guifg=#00ee00 ctermbg=' . ctermbg . ' guibg=' . guibg . ' cterm=bold gui=bold'
+    exec 'hi gitGutterDelete ctermfg=darkred    guifg=#dd0000 ctermbg=' . ctermbg . ' guibg=' . guibg . ' cterm=bold gui=bold'
 
     sign define change        text=! texthl=gitGutterChange
     sign define add           text=+ texthl=gitGutterAdd
