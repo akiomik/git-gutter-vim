@@ -110,9 +110,11 @@ endfunction
 " get different between HEAD and current
 " current: current file path
 function! s:get_diff(current)
-    let filename = expand("%")  " NOTE: %:p だとフルパス
+    let filename = expand("%")
+    let prefix = system('git rev-parse --show-prefix')[ :-2]
+    echo 'git show HEAD:' . prefix . filename . ' | diff - ' . a:current
 
-    let diff = system('git show HEAD:./' . filename . ' | diff - ' . a:current)
+    let diff = system('git show HEAD:' . prefix . filename . ' | diff - ' . a:current)
     return split(diff, '\n')
 endfunction
 
