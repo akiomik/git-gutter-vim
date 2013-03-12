@@ -35,12 +35,6 @@ function! s:init()
     sign define add           text=+ texthl=gitGutterAdd
     sign define delete_top    text=^ texthl=gitGutterDelete
     sign define delete_bottom text=_ texthl=gitGutterDelete
-
-    " init window variables
-    if !exists('w:marked_lines')
-        let w:marked_lines = {}
-        let w:prev_marked_lines = {}
-    endif
 endfunction
 
 
@@ -57,7 +51,7 @@ function! s:mark(name, begin, end)
 
         " set
         exe ":sign place " . i . " line=" . i . " name=" . a:name . " file=" . expand("%:p")
-        let w:marked_lines[i] = a:name
+        let b:marked_lines[i] = a:name
 
         let i += 1
     endwhile
@@ -66,9 +60,9 @@ endfunction
 
 " reset mark
 function! s:reset_mark(i)
-    if has_key(w:prev_marked_lines, a:i)
+    if has_key(b:prev_marked_lines, a:i)
         exe ":sign unplace " . a:i . " file=" . expand("%:p")
-        call remove(w:prev_marked_lines, a:i)
+        call remove(b:prev_marked_lines, a:i)
     endif
 endfunction
 
@@ -112,7 +106,6 @@ endfunction
 function! s:get_diff(current)
     let filename = expand("%")
     let prefix = system('git rev-parse --show-prefix')[ :-2]
-    echo 'git show HEAD:' . prefix . filename . ' | diff - ' . a:current
 
     let diff = system('git show HEAD:' . prefix . filename . ' | diff - ' . a:current)
     return split(diff, '\n')
@@ -137,8 +130,11 @@ function! gitgutter#git_gutter()
     let diff = s:get_diff(current)
 
     " init marked lines
-    let w:prev_marked_lines = w:marked_lines
-    let w:marked_lines = {}
+    if !exists('b:marked_lines')
+        let b:marked_lines = {}
+    endif
+    let b:prev_marked_lines = b:marked_lines
+    let b:marked_lines = {}
 
     " parse diff
     for line in diff
@@ -168,7 +164,7 @@ function! gitgutter#git_gutter()
         endif
     endfor
 
-    for i in keys(w:prev_marked_lines)
+    for i in keys(b:prev_marked_lines)
         call s:reset_mark(i)
     endfor
 endfunction
