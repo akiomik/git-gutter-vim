@@ -5,7 +5,10 @@ function! s:get_sign_ctermbg()
     redir END
 
     let index = match(sign_col, 'ctermbg')
-    let ctermbg = strpart(sign_col, index + 8, 3)
+    "may return values like 'ctermbg=8' or 'ctermbg=256'
+    let ctermbg_str = matchstr(@x, 'ctermbg=\d')
+    let val_len = strlen(ctermbg_str) - 8
+    let ctermbg = strpart(sign_col, index + 8, val_len)
     return ctermbg
 endfunction
 
