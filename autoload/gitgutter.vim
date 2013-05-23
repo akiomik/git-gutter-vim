@@ -5,7 +5,7 @@ function! s:get_sign_ctermbg()
     redir END
 
     let index = match(sign_col, 'ctermbg')
-    let ctermbg = strpart(sign_col, index + 8, 3)
+    let ctermbg = split(strpart(sign_col, index + 8, 3), ' ')[0]
     return ctermbg
 endfunction
 
