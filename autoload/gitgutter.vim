@@ -5,7 +5,7 @@ function! s:get_sign_ctermbg()
     redir END
 
     let index = match(sign_col, 'ctermbg')
-    let ctermbg = strpart(sign_col, index + 8, 3)
+    let ctermbg = split(strpart(sign_col, index + 8, 3), ' ')[0]
     return ctermbg
 endfunction
 
@@ -104,7 +104,7 @@ endfunction
 " get different between HEAD and current
 " current: current file path
 function! s:get_diff(current)
-    let filename = expand("%")
+    let filename = expand("%:.")
     let prefix = system('git rev-parse --show-prefix')[ :-2]
 
     let diff = system('git show HEAD:' . prefix . filename . ' | diff - ' . a:current)
