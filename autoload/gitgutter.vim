@@ -5,7 +5,10 @@ function! s:get_sign_ctermbg()
     redir END
 
     let index = match(sign_col, 'ctermbg')
-    let ctermbg = strpart(sign_col, index + 8, 3)
+    "may return values like 'ctermbg=8' or 'ctermbg=256'
+    let ctermbg_str = matchstr(sign_col, 'ctermbg=\d')
+    let val_len = strlen(ctermbg_str) - 8
+    let ctermbg = strpart(sign_col, index + 8, val_len)
     return ctermbg
 endfunction
 
@@ -104,10 +107,10 @@ endfunction
 " get different between HEAD and current
 " current: current file path
 function! s:get_diff(current)
-    let filename = expand("%")
-    let prefix = system('git rev-parse --show-prefix')[ :-2]
-
-    let diff = system('git show HEAD:' . prefix . filename . ' | diff - ' . a:current)
+    let filename = expand("%:t")
+    let filedir = expand("%:p:h")
+    let prefix = system('cd ' . filedir . '; git rev-parse --show-prefix; cd -')[ :-2]
+    let diff = system('cd ' . filedir . '; git show HEAD:' . prefix . filename . ' | diff - ' . a:current . '; cd -')
     return split(diff, '\n')
 endfunction
 
