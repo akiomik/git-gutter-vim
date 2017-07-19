@@ -113,6 +113,7 @@ function! s:get_diff(current)
     let prefix = system('cd ' . filedir . '; git rev-parse --show-prefix; cd -')[ :-2]
     let path = shellescape(prefix . filename)
     let diff = system('cd ' . filedir . '; git show HEAD:' . path . ' | diff - ' . current . '; cd -')
+    return split(diff, '\n')
 endfunction
 
 
