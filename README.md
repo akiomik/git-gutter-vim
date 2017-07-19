@@ -7,7 +7,7 @@ git-gutter-vim
 `git-gutter.vim` is a vim plugin version of [git-gutter](http://github.com/jisaacks/GitGutter)(sublime text2 plugin).
 This plugin updates gutter when you save a file.
 
-![screenshot](http://github.com/akiomik/git-gutter-vim/raw/master/screenshot.png)
+![screenshot](https://raw.githubusercontent.com/akiomik/git-gutter-vim/master/screenshot.png)
 
 
 ## Quick installation (with [NeoBundle](http://github.com/Shougo/neobundle.vim))
