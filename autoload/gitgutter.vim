@@ -78,7 +78,7 @@ endfunction
 
 " check for a git repository
 function! s:is_git_repos()
-    let path = expand("%:r")
+    let path = shellescape(expand("%:r"))
     let ret = system('git status ' . path . ' 2> /dev/null; echo $?')
 
     if ret
@@ -107,11 +107,12 @@ endfunction
 " get different between HEAD and current
 " current: current file path
 function! s:get_diff(current)
+    let current = shellescape(a:current)
     let filename = expand("%:t")
-    let filedir = expand("%:p:h")
+    let filedir = shellescape(expand("%:p:h"))
     let prefix = system('cd ' . filedir . '; git rev-parse --show-prefix; cd -')[ :-2]
-    let diff = system('cd ' . filedir . '; git show HEAD:' . prefix . filename . ' | diff - ' . a:current . '; cd -')
-    return split(diff, '\n')
+    let path = shellescape(prefix . filename)
+    let diff = system('cd ' . filedir . '; git show HEAD:' . path . ' | diff - ' . current . '; cd -')
 endfunction
 
 
