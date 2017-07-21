@@ -4,11 +4,8 @@ function! s:get_sign_ctermbg()
         silent hi SignColumn
     redir END
 
-    let index = match(sign_col, 'ctermbg')
     "may return values like 'ctermbg=8' or 'ctermbg=256'
-    let ctermbg_str = matchstr(sign_col, 'ctermbg=\d\+')
-    let val_len = strlen(ctermbg_str) - 8
-    let ctermbg = strpart(sign_col, index + 8, val_len)
+    let ctermbg = matchlist(sign_col, 'ctermbg=\(\d\+\)')[1]
     return ctermbg
 endfunction
 
@@ -19,8 +16,7 @@ function! s:get_sign_guibg()
         silent hi SignColumn
     redir END
 
-    let index = match(sign_col, 'guibg')
-    let guibg = strpart(sign_col, index + 6, 7)
+    let guibg = matchlist(sign_col, 'guibg=\([^ ]\+\)')[1]
     return guibg
 endfunction
 
